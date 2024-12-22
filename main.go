@@ -43,7 +43,7 @@ func main() {
 		log.Fatalf("failed to load AWS config: %v", err)
 	}
 
-	// 1. ECS クラスター名の取得
+	// ECS クラスター名の取得
 	clusterName, err := getEcsClusterNameFromStack(ctx, cfg, *stackName)
 	if err != nil {
 		log.Fatalf("Failed to get ECS cluster name: %v", err)
@@ -51,11 +51,11 @@ func main() {
 	if clusterName == "" {
 		log.Printf("No ECS::Cluster in stack: %s", *stackName)
 	} else {
-		// 2. ECSサービスを停止・削除
+		// ECSサービスを停止・削除
 		if err := deleteEcsServices(ctx, cfg, clusterName); err != nil {
 			log.Fatalf("Failed to delete ECS services: %v", err)
 		}
-		// 3. タスクを停止
+		// タスクを停止
 		if err := stopRemainingTasks(ctx, cfg, clusterName); err != nil {
 			log.Fatalf("Failed to stop tasks: %v", err)
 		}
@@ -173,7 +173,7 @@ func stopRemainingTasks(ctx context.Context, cfg aws.Config, clusterName string)
 	return nil
 }
 
-// cdk destroy 実行
+// コマンド実行
 func runCdkDestroy(profile, cdkAppRoot, cdkAppPath string) error {
 	args := []string{"destroy", "--all", "--force"}
 	if profile != "" {
@@ -186,17 +186,10 @@ func runCdkDestroy(profile, cdkAppRoot, cdkAppPath string) error {
 
 	log.Printf("Executing: cdk %s", strings.Join(args, " "))
 
-	// コマンド作成
 	cmd := exec.Command("cdk", args...)
-
-	// ★ ポイント: カレントディレクトリをCDKアプリのルートに変更
 	cmd.Dir = cdkAppRoot
-
-	// 出力を標準出力・標準エラーに紐付け
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-
-	// 実行
 	return cmd.Run()
 }
 
